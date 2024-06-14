@@ -1,0 +1,21 @@
+<!-- res/drawable/loading_animation.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <group>
+        <path
+            android:name="circle1"
+            android:fillColor="#509CFF"
+            android:pathData="M 40,50 A 15,15 0 1,1 25,65 A 15,15 0 1,1 40,50"/>
+        <path
+            android:name="circle2"
+            android:fillColor="#509CFF"
+            android:pathData="M 100,50 A 15,15 0 1,1 85,65 A 15,15 0 1,1 100,50"/>
+        <path
+            android:name="circle3"
+            android:fillColor="#509CFF"
+            android:pathData="M 160,50 A 15,15 0 1,1 145,65 A 15,15 0 1,1 160,50"/>
+    </group>
+</vector>
