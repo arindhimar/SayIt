@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +39,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.InputStream
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -57,28 +57,23 @@ class MainActivity : ComponentActivity() {
 fun MainContent() {
     var quote by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
-    var isFetching by remember { mutableStateOf(true) } // Initially set to true
-    var isRefreshing by remember { mutableStateOf(false) } // Flag to prevent multiple fetches
+    var isFetching by remember { mutableStateOf(true) }
+    var isRefreshing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // Function to fetch and set quote
     fun fetchAndSetQuote() {
         scope.launch {
-            isFetching = true // Set fetching to true
+            isFetching = true
             val fetchedQuote = fetchQuote()
-
-            // Check if the fetched quote is different from the current one
             if (fetchedQuote.first != quote || fetchedQuote.second != author) {
                 quote = fetchedQuote.first
                 author = fetchedQuote.second
             }
-
-            isFetching = false // Set fetching to false once done
-            isRefreshing = false // Reset refreshing flag
+            isFetching = false
+            isRefreshing = false
         }
     }
 
-    // LaunchedEffect to fetch quote initially
     LaunchedEffect(Unit) {
         fetchAndSetQuote()
     }
@@ -88,10 +83,9 @@ fun MainContent() {
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectDragGestures { _, dragAmount ->
-                    // Check for downward swipe (dragAmount.y > 0)
-                    if (dragAmount.y > 0 && !isRefreshing) { // Check if not already refreshing
-                        isRefreshing = true // Set refreshing flag
-                        fetchAndSetQuote() // Fetch and set quote
+                    if (dragAmount.y > 0 && !isRefreshing) {
+                        isRefreshing = true
+                        fetchAndSetQuote()
                     }
                 }
             }
@@ -99,7 +93,6 @@ fun MainContent() {
         MainContext(quote, author, isFetching)
     }
 }
-
 
 suspend fun fetchQuote(): Pair<String, String> = withContext(Dispatchers.IO) {
     val categories = listOf(
@@ -118,7 +111,7 @@ suspend fun fetchQuote(): Pair<String, String> = withContext(Dispatchers.IO) {
     val request = Request.Builder()
         .url("https://api.api-ninjas.com/v1/quotes?category=$randomCategory")
         .addHeader("accept", "application/json")
-        .addHeader("X-Api-Key", "1nkiJyFpOk3fEyxbf7LrfA==Q0NKhCa3hiJGcdSQ") // Add your API key here
+        .addHeader("X-Api-Key", "1nkiJyFpOk3fEyxbf7LrfA==Q0NKhCa3hiJGcdSQ")
         .build()
 
     client.newCall(request).execute().use { response ->
@@ -156,17 +149,15 @@ fun MainContext(quote: String, author: String, isFetching: Boolean) {
                     .padding(16.dp)
             ) {
                 if (isFetching) {
-                    // Show the Lottie animation
                     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
                     LottieAnimation(
                         composition,
                         iterations = LottieConstants.IterateForever,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp) // Adjust the height as needed
+                            .height(200.dp)
                     )
                 } else {
-                    // Show the quote content
                     AnimatedVisibility(
                         visible = !isFetching,
                         enter = fadeIn(animationSpec = tween(1000)) + expandVertically(animationSpec = tween(1000)),
@@ -193,7 +184,7 @@ fun MainContext(quote: String, author: String, isFetching: Boolean) {
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            SocialMediaButtons()
+                            SocialMediaButtons(quote, author)
                         }
                     }
                 }
@@ -203,7 +194,10 @@ fun MainContext(quote: String, author: String, isFetching: Boolean) {
 }
 
 @Composable
-fun SocialMediaButtons() {
+fun SocialMediaButtons(quote: String, author: String) {
+    val context = LocalContext.current
+    val message = "\"$quote\" ~ $author"
+
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxWidth()
@@ -214,7 +208,14 @@ fun SocialMediaButtons() {
         ) {
             val iconModifier = Modifier.size(24.dp)
 
-            TextButton(onClick = { /* Handle Facebook click */ }) {
+            TextButton(onClick = {
+                shareOnSocialMedia(
+                    context,
+                    "com.facebook.katana",
+                    "https://www.facebook.com/sharer/sharer.php?u=http://example.com",
+                    message
+                )
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.facebook),
                     contentDescription = "Facebook",
@@ -222,7 +223,14 @@ fun SocialMediaButtons() {
                     modifier = iconModifier
                 )
             }
-            TextButton(onClick = { /* Handle Instagram click */ }) {
+            TextButton(onClick = {
+                shareOnSocialMedia(
+                    context,
+                    "com.instagram.android",
+                    "https://www.instagram.com/?url=http://example.com",
+                    message
+                )
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.instagram),
                     contentDescription = "Instagram",
@@ -230,7 +238,14 @@ fun SocialMediaButtons() {
                     modifier = iconModifier
                 )
             }
-            TextButton(onClick = { /* Handle Twitter click */ }) {
+            TextButton(onClick = {
+                shareOnSocialMedia(
+                    context,
+                    "com.twitter.android",
+                    "https://twitter.com/intent/tweet?text=$message",
+                    message
+                )
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.twitter),
                     contentDescription = "Twitter",
@@ -245,7 +260,14 @@ fun SocialMediaButtons() {
         ) {
             val iconModifier = Modifier.size(24.dp)
 
-            TextButton(onClick = { /* Handle Snapchat click */ }) {
+            TextButton(onClick = {
+                shareOnSocialMedia(
+                    context,
+                    "com.snapchat.android",
+                    "https://www.snapchat.com",
+                    message
+                )
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.snapchat),
                     contentDescription = "Snapchat",
@@ -253,7 +275,14 @@ fun SocialMediaButtons() {
                     modifier = iconModifier
                 )
             }
-            TextButton(onClick = { /* Handle WhatsApp click */ }) {
+            TextButton(onClick = {
+                shareOnSocialMedia(
+                    context,
+                    "com.whatsapp",
+                    "https://api.whatsapp.com/send?text=$message",
+                    message
+                )
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.whatsapp),
                     contentDescription = "WhatsApp",
