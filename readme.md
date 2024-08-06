@@ -15,10 +15,9 @@ SayIt provides a beautifully designed interface to share daily quotes, allowing 
 
 ## Screenshots
 
-![Screenshot 1](Images/1.jpeg)
-![Screenshot 2](Images/2.jpeg)
-![Screenshot 3](Images/3.jpeg)
-![Screenshot 4](Images/4.jpeg)
+| ![Screenshot 1](Images/1.jpeg) | ![Screenshot 2](Images/2.jpeg) |
+|:-------------------------------:|:-------------------------------:|
+| ![Screenshot 3](Images/3.jpeg) | ![Screenshot 4](Images/4.jpeg) |
 
 ## Installation
 
