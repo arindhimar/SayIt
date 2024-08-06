@@ -199,7 +199,7 @@ fun MainContext(quote: String, author: String, isFetching: Boolean) {
 @Composable
 fun SocialMediaButtons(quote: String, author: String) {
     val context = LocalContext.current
-    val appDownloadLink = "https://yourappdownloadlink.com"
+    val appDownloadLink = "https://github.com/arindhimar/SayIt/raw/main/SampleApp/app-debug.apk"
     val message = "\"$quote\" ~ $author\n\nShared using the SayIt app. Download it here: $appDownloadLink"
 
     Column(
