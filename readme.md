@@ -35,26 +35,3 @@ Ensure you have the following installed:
 git clone https://github.com/arindhimar/SayIt.git
 cd SayIt
 
-# SayIt - Build and Configuration Guide
-
-## Build and Run
-
-1. **Open the Project in Android Studio:**
-   - Launch Android Studio and open the `SayIt` project.
-
-2. **Build the Project:**
-   - Click on `Build` in the top menu.
-   - Select `Rebuild Project` to compile the project.
-
-3. **Run the App:**
-   - Connect an Android device or start an emulator.
-   - Click on `Run` in the top menu.
-   - Select `Run 'app'` to deploy the app to the device or emulator.
-
-## Configuration
-
-- **API Key:**
-  - Set up your API key for the quotes API by adding it to your `gradle.properties` file:
-
-  ```properties
-  API_KEY=your_api_key_here
