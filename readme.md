@@ -1,6 +1,8 @@
 # SayIt
 
-![SayIt Logo](path/to/logo.png)
+![SayIt Logo](Logo/MainLogoSVG.png)
+
+
 
 Welcome to **SayIt** – your daily dose of inspiration and motivation delivered right to your phone! 
 
