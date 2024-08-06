@@ -1,15 +1,14 @@
 package com.example.dailyquotes
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -41,20 +40,31 @@ import okhttp3.Request
 import java.io.InputStream
 import kotlin.random.Random
 
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            DailyQuotesTheme {
-                MainContent()
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val selectedCategories = sharedPreferences.getStringSet("SELECTED_CATEGORIES", setOf())
+
+        if (selectedCategories != null && selectedCategories.size >= 3) {
+            setContent {
+                DailyQuotesTheme {
+                    MainContent(selectedCategories.toList())
+                }
             }
+        } else {
+            val intent = Intent(this, ChoicesActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }
 
 @Composable
-fun MainContent() {
+fun MainContent(selectedCategories: List<String>) {
     var quote by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
     var isFetching by remember { mutableStateOf(true) }
@@ -64,7 +74,7 @@ fun MainContent() {
     fun fetchAndSetQuote() {
         scope.launch {
             isFetching = true
-            val fetchedQuote = fetchQuote()
+            val fetchedQuote = fetchQuote(selectedCategories)
             if (fetchedQuote.first != quote || fetchedQuote.second != author) {
                 quote = fetchedQuote.first
                 author = fetchedQuote.second
@@ -94,28 +104,21 @@ fun MainContent() {
     }
 }
 
-suspend fun fetchQuote(): Pair<String, String> = withContext(Dispatchers.IO) {
-    val categories = listOf(
-        "age", "alone", "amazing", "anger", "architecture", "art", "attitude", "beauty", "best",
-        "birthday", "business", "car", "change", "communication", "computers", "cool", "courage",
-        "dad", "dating", "death", "design", "dreams", "education", "environmental", "equality",
-        "experience", "failure", "faith", "family", "famous", "fear", "fitness", "food", "forgiveness",
-        "freedom", "friendship", "funny", "future", "god", "good", "government", "graduation", "great",
-        "happiness", "health", "history", "home", "hope", "humor", "imagination", "inspirational",
-        "intelligence", "jealousy", "knowledge", "leadership", "learning", "legal", "life", "love",
-        "marriage", "medical", "men", "mom", "money", "morning", "movies", "success"
-    )
+suspend fun fetchQuote(categories: List<String>): Pair<String, String> = withContext(Dispatchers.IO) {
+    val apiKey = "1nkiJyFpOk3fEyxbf7LrfA==Q0NKhCa3hiJGcdSQ"
+
     val randomCategory = categories[Random.nextInt(categories.size)]
+    val url = "https://api.api-ninjas.com/v1/quotes?category=$randomCategory"
 
     val client = OkHttpClient()
     val request = Request.Builder()
-        .url("https://api.api-ninjas.com/v1/quotes?category=$randomCategory")
+        .url(url)
         .addHeader("accept", "application/json")
-        .addHeader("X-Api-Key", "1nkiJyFpOk3fEyxbf7LrfA==Q0NKhCa3hiJGcdSQ")
+        .addHeader("X-Api-Key", apiKey)
         .build()
 
     client.newCall(request).execute().use { response ->
-        val responseStream: InputStream = response.body?.byteStream() ?: return@withContext Pair("No quote found", "")
+        val responseStream = response.body?.byteStream() ?: return@withContext Pair("No quote found", "")
         val mapper = ObjectMapper()
         val root: JsonNode = mapper.readTree(responseStream)
         val quoteText = root.path(0).path("quote").asText()
@@ -196,7 +199,8 @@ fun MainContext(quote: String, author: String, isFetching: Boolean) {
 @Composable
 fun SocialMediaButtons(quote: String, author: String) {
     val context = LocalContext.current
-    val message = "\"$quote\" ~ $author"
+    val appDownloadLink = "https://yourappdownloadlink.com"
+    val message = "\"$quote\" ~ $author\n\nShared using the SayIt app. Download it here: $appDownloadLink"
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -211,9 +215,7 @@ fun SocialMediaButtons(quote: String, author: String) {
             TextButton(onClick = {
                 shareOnSocialMedia(
                     context,
-                    "com.facebook.katana",
-                    "https://www.facebook.com/sharer/sharer.php?u=http://example.com",
-                    message
+                    "https://www.facebook.com/sharer/sharer.php?u=http://example.com&quote=${Uri.encode(message)}"
                 )
             }) {
                 Image(
@@ -226,9 +228,7 @@ fun SocialMediaButtons(quote: String, author: String) {
             TextButton(onClick = {
                 shareOnSocialMedia(
                     context,
-                    "com.instagram.android",
-                    "https://www.instagram.com/?url=http://example.com",
-                    message
+                    "https://www.instagram.com/?url=http://example.com&text=${Uri.encode(message)}"
                 )
             }) {
                 Image(
@@ -241,9 +241,7 @@ fun SocialMediaButtons(quote: String, author: String) {
             TextButton(onClick = {
                 shareOnSocialMedia(
                     context,
-                    "com.twitter.android",
-                    "https://twitter.com/intent/tweet?text=$message",
-                    message
+                    "https://twitter.com/intent/tweet?text=${Uri.encode(message)}"
                 )
             }) {
                 Image(
@@ -263,9 +261,7 @@ fun SocialMediaButtons(quote: String, author: String) {
             TextButton(onClick = {
                 shareOnSocialMedia(
                     context,
-                    "com.snapchat.android",
-                    "https://www.snapchat.com",
-                    message
+                    "https://www.snapchat.com?text=${Uri.encode(message)}"
                 )
             }) {
                 Image(
@@ -278,9 +274,7 @@ fun SocialMediaButtons(quote: String, author: String) {
             TextButton(onClick = {
                 shareOnSocialMedia(
                     context,
-                    "com.whatsapp",
-                    "https://api.whatsapp.com/send?text=$message",
-                    message
+                    "https://api.whatsapp.com/send?text=${Uri.encode(message)}"
                 )
             }) {
                 Image(
@@ -292,6 +286,14 @@ fun SocialMediaButtons(quote: String, author: String) {
             }
         }
     }
+}
+
+fun shareOnSocialMedia(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse(url)
+    }
+    val chooserIntent = Intent.createChooser(intent, "Share via")
+    context.startActivity(chooserIntent)
 }
 
 @Preview(showBackground = true)

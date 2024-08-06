@@ -1,15 +1,111 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Local configuration files
+.local/
 local.properties
+*.iml
+
+# Android Studio files
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Log files
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Miscellaneous
+*.apk
+*.ap_
+*.dex
+*.class
+*.jar
+*.war
+*.ear
+
+# Keystore files
+*.jks
+*.keystore
+
+# NDK
+*.so
+
+# JetBrains
+.idea/
+
+# Android Studio Navigation Editor
+.navigation/
+
+# IntelliJ
+*.iws
+*.ipr
+
+# Gradle Wrapper
+gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio configuration files
+.idea/
+*.iml
+
+# Mac
+*.DS_Store
+
+# Windows
+Thumbs.db
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Log files
+*.log
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.swp
+
+# Keystore files
+*.jks
+*.keystore
+
+# Miscellaneous
+*.apk
+*.ap_
+*.dex
+*.class
+*.jar
+*.war
+*.ear
+
+# NDK
+*.so
+
+# Local configuration files
+local.properties
+
+# Google Services JSON
+google-services.json
+
+# Dependency files
+*.pom
+*.jar
+
+# IDE-specific files
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Gradle Wrapper
+gradle/wrapper/gradle-wrapper.jar

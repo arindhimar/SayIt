@@ -1,0 +1,6 @@
+Hindi Quotes - https://github.com/nkilm/hindi-quotes?tab=readme-ov-file
+https://api.api-ninjas.com/v1/quotes
+X-Api-Key  - 
+https://quotes.rest/
+https://api-ninjas.com/api/quotes
+https://zenquotes.io/
